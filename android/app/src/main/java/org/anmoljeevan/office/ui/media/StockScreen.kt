@@ -40,7 +40,7 @@ import androidx.compose.material.icons.rounded.DeleteOutline
 import androidx.compose.material.icons.rounded.DoNotDisturbOn
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Link
-import androidx.compose.material.icons.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -262,7 +262,7 @@ private fun ItemCard(store: MediaStore, item: ContentItem) {
                         Modifier.then(if (url != null) Modifier.bouncyClick(shape = RoundedCornerShape(100)) { Launch.openUrl(context, url) } else Modifier),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Icon(if (url != null) Icons.Rounded.OpenInNew else Icons.Rounded.Link, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
+                        Icon(if (url != null) Icons.AutoMirrored.Rounded.OpenInNew else Icons.Rounded.Link, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(15.dp))
                         Spacer(Modifier.width(5.dp))
                         Text(
                             if (url != null) "Open link" else item.link,

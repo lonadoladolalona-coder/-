@@ -24,12 +24,12 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Archive
 import androidx.compose.material.icons.rounded.Badge
 import androidx.compose.material.icons.rounded.Call
-import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Email
 import androidx.compose.material.icons.rounded.Event
-import androidx.compose.material.icons.rounded.Notes
+import androidx.compose.material.icons.automirrored.rounded.Notes
 import androidx.compose.material.icons.rounded.Phone
 import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material.icons.rounded.Warning
@@ -186,7 +186,7 @@ fun RegistrationDetail(
 
                 item("actions") {
                     Row(Modifier.fillMaxWidth().staggeredEntrance(1), horizontalArrangement = Arrangement.SpaceEvenly) {
-                        QuickAction("WhatsApp", Icons.Rounded.Chat, c.success, enabled = r.phone.isNotBlank()) { Launch.whatsApp(context, r.phone) }
+                        QuickAction("WhatsApp", Icons.AutoMirrored.Rounded.Chat, c.success, enabled = r.phone.isNotBlank()) { Launch.whatsApp(context, r.phone) }
                         QuickAction("Call", Icons.Rounded.Call, Brand.BrightBlue, enabled = r.phone.isNotBlank()) { Launch.dial(context, r.phone) }
                         QuickAction("Email", Icons.Rounded.Email, Brand.Indigo, enabled = r.email.isNotBlank()) { Launch.email(context, r.email) }
                         QuickAction("Copy", Icons.Rounded.ContentCopy, Brand.Slate, enabled = r.phone.isNotBlank()) { Launch.copy(context, "Phone", r.phone) }
@@ -219,7 +219,7 @@ fun RegistrationDetail(
                     AjmCard(Modifier.fillMaxWidth().staggeredEntrance(3), contentPadding = PaddingValues(vertical = 8.dp)) {
                         InfoRow(Icons.Rounded.Phone, "Phone", r.phone, onClick = if (r.phone.isNotBlank()) ({ Launch.whatsApp(context, r.phone) }) else null)
                         InfoRow(Icons.Rounded.Email, "Email", r.email, onClick = if (r.email.isNotBlank()) ({ Launch.email(context, r.email) }) else null)
-                        InfoRow(Icons.Rounded.Notes, "Details", r.details)
+                        InfoRow(Icons.AutoMirrored.Rounded.Notes, "Details", r.details)
                         InfoRow(Icons.Rounded.Event, "Registered", Text.dateTime(r.timestamp))
                         if (hasId) InfoRow(Icons.Rounded.Badge, "Registration ID", r.id, small = true)
                     }

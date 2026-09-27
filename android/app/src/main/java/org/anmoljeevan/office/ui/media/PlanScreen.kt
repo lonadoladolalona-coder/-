@@ -31,7 +31,7 @@ import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Groups
 import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.LiveTv
-import androidx.compose.material.icons.rounded.MenuBook
+import androidx.compose.material.icons.automirrored.rounded.MenuBook
 import androidx.compose.material.icons.rounded.MusicNote
 import androidx.compose.material.icons.rounded.OndemandVideo
 import androidx.compose.material.icons.rounded.Slideshow
@@ -85,7 +85,7 @@ fun planIcon(key: String): ImageVector = when (key) {
     "reel" -> Icons.Rounded.Slideshow
     "live" -> Icons.Rounded.LiveTv
     "long" -> Icons.Rounded.OndemandVideo
-    "story" -> Icons.Rounded.MenuBook
+    "story" -> Icons.AutoMirrored.Rounded.MenuBook
     "promo" -> Icons.Rounded.Campaign
     "promovid" -> Icons.Rounded.Image
     "song" -> Icons.Rounded.MusicNote

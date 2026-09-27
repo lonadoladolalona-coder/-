@@ -28,9 +28,9 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.BarChart
 import androidx.compose.material.icons.rounded.CalendarMonth
 import androidx.compose.material.icons.rounded.FileDownload
-import androidx.compose.material.icons.rounded.HelpOutline
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
 import androidx.compose.material.icons.rounded.Inventory2
-import androidx.compose.material.icons.rounded.Logout
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.material.icons.rounded.ViewWeek
@@ -129,7 +129,7 @@ fun MediaRoot(store: MediaStore, onLogout: () -> Unit) {
                     }
                 },
                 actions = {
-                    IconButton(onClick = { store.setHowto(!store.howtoVisible) }) { Icon(Icons.Rounded.HelpOutline, "How to use") }
+                    IconButton(onClick = { store.setHowto(!store.howtoVisible) }) { Icon(Icons.AutoMirrored.Rounded.HelpOutline, "How to use") }
                     if (store.tab == MediaTab.SUMMARY) {
                         IconButton(onClick = store::reloadTotals) { Icon(Icons.Rounded.Refresh, "Refresh") }
                     }
@@ -161,7 +161,7 @@ fun MediaRoot(store: MediaStore, onLogout: () -> Unit) {
                             if (store.tab == MediaTab.STOCK || store.tab == MediaTab.SUMMARY) HorizontalDivider()
                             DropdownMenuItem(
                                 text = { Text("Log out") },
-                                leadingIcon = { Icon(Icons.Rounded.Logout, null) },
+                                leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Logout, null) },
                                 onClick = {
                                     menu = false
                                     store.logout(onLogout)

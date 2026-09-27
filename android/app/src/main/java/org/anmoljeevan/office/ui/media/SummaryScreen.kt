@@ -25,7 +25,7 @@ import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Inventory2
 import androidx.compose.material.icons.rounded.Layers
-import androidx.compose.material.icons.rounded.PlaylistAdd
+import androidx.compose.material.icons.automirrored.rounded.PlaylistAdd
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -152,7 +152,7 @@ private fun Tiles(store: MediaStore) {
                 "Not listed",
                 l.unlisted,
                 if (l.unlisted > 0) "left but not in the list" else "all listed",
-                Icons.Rounded.PlaylistAdd,
+                Icons.AutoMirrored.Rounded.PlaylistAdd,
                 c.warning,
                 Modifier.weight(1f).staggeredEntrance(3),
             )

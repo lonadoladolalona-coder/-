@@ -41,7 +41,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.History
@@ -451,7 +451,7 @@ private fun PersonCard(
                 )
             }
             if (!opened) {
-                GradientButton("Open WhatsApp", onClick = onOpen, icon = Icons.Rounded.Chat, brush = WhatsAppGreen, modifier = Modifier.fillMaxWidth())
+                GradientButton("Open WhatsApp", onClick = onOpen, icon = Icons.AutoMirrored.Rounded.Chat, brush = WhatsAppGreen, modifier = Modifier.fillMaxWidth())
                 Spacer(Modifier.height(10.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     SoftButton("Skip", onSkip, color = Brand.Slate, icon = Icons.Rounded.SkipNext)

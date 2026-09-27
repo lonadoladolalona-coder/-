@@ -43,11 +43,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Logout
+import androidx.compose.material.icons.automirrored.rounded.Logout
 import androidx.compose.material.icons.automirrored.rounded.Send
-import androidx.compose.material.icons.rounded.Sort
+import androidx.compose.material.icons.automirrored.rounded.Sort
 import androidx.compose.material.icons.rounded.Archive
-import androidx.compose.material.icons.rounded.Chat
+import androidx.compose.material.icons.automirrored.rounded.Chat
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.CheckCircle
 import androidx.compose.material.icons.rounded.Close
@@ -248,7 +248,7 @@ private fun RegistrationsScreen(
                                     HorizontalDivider()
                                     DropdownMenuItem(
                                         text = { Text("Log out") },
-                                        leadingIcon = { Icon(Icons.Rounded.Logout, null) },
+                                        leadingIcon = { Icon(Icons.AutoMirrored.Rounded.Logout, null) },
                                         onClick = {
                                             menu = false
                                             onLogout()
@@ -442,7 +442,7 @@ private fun FilterBar(store: AdminStore) {
                         .background(c.card)
                         .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
                     contentAlignment = Alignment.Center,
-                ) { Icon(Icons.Rounded.Sort, "Sort") }
+                ) { Icon(Icons.AutoMirrored.Rounded.Sort, "Sort") }
                 DropdownMenu(expanded = sortMenu, onDismissRequest = { sortMenu = false }) {
                     SORT_OPTIONS.forEach { o ->
                         DropdownMenuItem(
@@ -618,7 +618,7 @@ private fun RegistrationCard(
             if (r.phone.isNotBlank() || r.email.isNotBlank()) {
                 Spacer(Modifier.height(12.dp))
                 FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (r.phone.isNotBlank()) ContactChip(Icons.Rounded.Chat, r.phone, c.success, onClick = { Launch.whatsApp(context, r.phone) })
+                    if (r.phone.isNotBlank()) ContactChip(Icons.AutoMirrored.Rounded.Chat, r.phone, c.success, onClick = { Launch.whatsApp(context, r.phone) })
                     if (r.email.isNotBlank()) ContactChip(Icons.Rounded.Email, r.email, primary, onClick = { Launch.email(context, r.email) })
                 }
             }
