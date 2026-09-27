@@ -67,6 +67,8 @@ fun PillSwitcher(
     height: Dp = 46.dp,
     brushFor: @Composable (Int) -> Brush = { AjmTheme.colors.heroBrush },
     container: Color = AjmTheme.colors.chip,
+    activeText: Color = Color.White,
+    inactiveText: Color = MaterialTheme.colorScheme.onSurfaceVariant,
 ) {
     val haptic = LocalHapticFeedback.current
     BoxWithConstraints(
@@ -95,7 +97,7 @@ fun PillSwitcher(
             options.forEachIndexed { i, opt ->
                 val active = i == selected
                 val fg by animateColorAsState(
-                    if (active) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                    if (active) activeText else inactiveText,
                     tween(250),
                     label = "pillFg",
                 )
@@ -127,10 +129,10 @@ fun PillSwitcher(
                         Box(
                             Modifier
                                 .clip(RoundedCornerShape(100))
-                                .background(if (active) Color.White.copy(alpha = 0.22f) else AjmTheme.colors.card)
+                                .background(if (active) activeText.copy(alpha = 0.18f) else inactiveText.copy(alpha = 0.14f))
                                 .padding(horizontal = 7.dp, vertical = 1.dp),
                         ) {
-                            RollingNumber(opt.count, MaterialTheme.typography.labelMedium, color = if (active) Color.White else MaterialTheme.colorScheme.onSurface)
+                            RollingNumber(opt.count, MaterialTheme.typography.labelMedium, color = fg)
                         }
                     }
                 }
