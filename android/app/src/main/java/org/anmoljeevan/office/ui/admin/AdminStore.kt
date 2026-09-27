@@ -43,6 +43,20 @@ sealed interface AdminDialog {
 val Registration.key: String get() = id.ifEmpty { "row:$timestamp|$name|$phone" }
 
 /**
+ * Keys that are unique even if a row was copy-pasted in the sheet (so its ID appears twice):
+ * the second copy gets "#2", and so on. Lists crash on repeated keys, so every list uses these.
+ */
+fun <T> uniqueKeys(list: List<T>, base: (T) -> String): List<String> {
+    val seen = HashMap<String, Int>()
+    return list.map { item ->
+        val k = base(item)
+        val n = (seen[k] ?: 0) + 1
+        seen[k] = n
+        if (n == 1) k else "$k#$n"
+    }
+}
+
+/**
  * Everything the admin screens show and do — admin.html's logic, as Compose state.
  * Lives as long as the login; [scope] is cancelled on log out.
  */
@@ -91,6 +105,16 @@ class AdminStore(private val api: AdminApi, initial: RegistrationList, val scope
         private set
 
     val visible by derivedStateOf { RegistrationRules.sort(RegistrationRules.filter(rows, filter, query), sort) }
+
+    /** Each row object's unique key, worked out once over the whole sheet so it never changes with filters. */
+    private val rowKeys by derivedStateOf {
+        val keys = uniqueKeys(rows) { it.key }
+        java.util.IdentityHashMap<Registration, String>().also { m -> rows.forEachIndexed { i, r -> m[r] = keys[i] } }
+    }
+
+    fun keyFor(r: Registration): String = rowKeys[r] ?: r.key
+
+    fun rowFor(key: String): Registration? = rows.firstOrNull { keyFor(it) == key }
     val stats by derivedStateOf { RegistrationRules.stats(rows) }
     val dupCounts by derivedStateOf { RegistrationRules.duplicateCounts(rows) }
     val filterCounts by derivedStateOf { RegFilter.entries.associateWith { RegistrationRules.countFor(rows, it) } }
@@ -282,7 +306,7 @@ class AdminStore(private val api: AdminApi, initial: RegistrationList, val scope
         }
         selection = selection - done
         val open = detailKey
-        if (open != null && rows.none { it.key == open && it.isActive }) detailKey = null
+        if (open != null && rowFor(open)?.isActive != true) detailKey = null
     }
 
     private fun bulkMessage(action: String, res: BulkOutcome, total: Int, status: String? = null, name: String? = null): String {

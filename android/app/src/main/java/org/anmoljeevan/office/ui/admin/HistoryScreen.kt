@@ -151,7 +151,10 @@ private fun MeetingsTab(store: AdminStore) {
                     EmptyState("🗂️", "No Zoom sends yet", "Use Send Zoom Link — each send is saved here under its meeting name.")
                 }
             } else {
-                items(store.meetings, key = { it.id }) { m ->
+                val list = store.meetings
+                val keys = uniqueKeys(list) { it.id }
+                items(list.size, key = { keys[it] }) { i ->
+                    val m = list[i]
                     MeetingCard(
                         m = m,
                         rest = MeetingRules.rest(store.rows, m).size,

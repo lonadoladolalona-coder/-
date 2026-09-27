@@ -60,6 +60,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,6 +77,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import org.anmoljeevan.office.core.Text
 import org.anmoljeevan.office.core.media.Cells
 import org.anmoljeevan.office.core.media.WeeklyPlan
@@ -590,6 +592,7 @@ private fun GridCell(v: String, striped: Boolean, sunday: Boolean, today: Boolea
 fun CellEditorSheet(store: MediaStore) {
     val ref = store.editing ?: return
     val state = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
     val date = store.month.atDay(ref.day.coerceIn(1, store.days))
     ModalBottomSheet(onDismissRequest = { store.editing = null }, sheetState = state, containerColor = MaterialTheme.colorScheme.surfaceContainerLowest) {
         Column(Modifier.fillMaxWidth().navigationBarsPadding().padding(bottom = 16.dp)) {
@@ -615,7 +618,12 @@ fun CellEditorSheet(store: MediaStore) {
                     }
                 }
                 Spacer(Modifier.height(8.dp))
-                GradientButton("Done", onClick = { store.editing = null }, modifier = Modifier.fillMaxWidth(), height = 50.dp)
+                GradientButton(
+                    "Done",
+                    onClick = { scope.launch { state.hide() }.invokeOnCompletion { store.editing = null } },
+                    modifier = Modifier.fillMaxWidth(),
+                    height = 50.dp,
+                )
             }
         }
     }

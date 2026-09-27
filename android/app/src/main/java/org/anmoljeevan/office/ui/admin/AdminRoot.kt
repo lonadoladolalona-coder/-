@@ -149,7 +149,7 @@ fun AdminRoot(store: AdminStore, onLogout: () -> Unit) {
                 if (key == null) {
                     RegistrationsScreen(store, listState, scrollBehavior, this@SharedTransitionLayout, this@AnimatedContent, onLogout)
                 } else {
-                    val r = store.rows.firstOrNull { it.key == key }
+                    val r = store.rowFor(key)
                     if (r != null) {
                         RegistrationDetail(r, store, this@SharedTransitionLayout, this@AnimatedContent)
                     } else {
@@ -275,7 +275,6 @@ private fun RegistrationsScreen(
                     expanded = listState.isScrollingUp(),
                     containerColor = Brand.Navy,
                     contentColor = Color.White,
-                    modifier = Modifier.navigationBarsPadding(),
                 )
             }
         },
@@ -301,7 +300,7 @@ private fun RegistrationsScreen(
                 if (visible.isEmpty()) {
                     item(key = "empty") { EmptyList(store) }
                 } else {
-                    items(visible, key = { it.key }, contentType = { "registration" }) { r ->
+                    items(visible, key = { store.keyFor(it) }, contentType = { "registration" }) { r ->
                         RegistrationCard(
                             r = r,
                             store = store,
@@ -533,6 +532,7 @@ private fun RegistrationCard(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val c = AjmTheme.colors
+    val key = store.keyFor(r)
     val selected = r.id.isNotEmpty() && r.id in store.selection
     val selecting = store.selecting
     val style = sourceStyle(r.source)
@@ -547,7 +547,7 @@ private fun RegistrationCard(
             modifier
                 .fillMaxWidth()
                 .sharedBounds(
-                    rememberSharedContentState("card-${r.key}"),
+                    rememberSharedContentState("card-$key"),
                     animatedVisibilityScope = anim,
                     resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                     clipInOverlayDuringTransition = OverlayClip(shape),
@@ -560,14 +560,14 @@ private fun RegistrationCard(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         store.toggle(r)
                     },
-                    onClick = { if (selecting) store.toggle(r) else store.detailKey = r.key },
+                    onClick = { if (selecting) store.toggle(r) else store.detailKey = key },
                 )
                 .background(bg)
                 .border(if (selected) 2.dp else 1.dp, border, shape)
                 .padding(16.dp),
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Box(Modifier.sharedElement(rememberSharedContentState("avatar-${r.key}"), anim)) {
+                Box(Modifier.sharedElement(rememberSharedContentState("avatar-$key"), anim)) {
                     AnimatedContent(
                         targetState = selected,
                         transitionSpec = { (scaleIn(spring(dampingRatio = 0.5f)) + fadeIn()) togetherWith (scaleOut() + fadeOut()) },
@@ -592,7 +592,7 @@ private fun RegistrationCard(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier
                                 .weight(1f, fill = false)
-                                .sharedBounds(rememberSharedContentState("name-${r.key}"), anim),
+                                .sharedBounds(rememberSharedContentState("name-$key"), anim),
                         )
                         if (dup > 1) {
                             Spacer(Modifier.width(6.dp))

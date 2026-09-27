@@ -59,6 +59,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -147,8 +148,9 @@ fun StockScreen(store: MediaStore) {
                         modifier = Modifier.padding(horizontal = 4.dp),
                     )
                 }
-                items(view.shown, key = { it.id }) { item ->
-                    SwipeItem(store, item, Modifier.animateItem())
+                val keys = org.anmoljeevan.office.ui.admin.uniqueKeys(view.shown) { it.id }
+                items(view.shown.size, key = { keys[it] }) { i ->
+                    SwipeItem(store, view.shown[i], Modifier.animateItem())
                 }
             }
         }
@@ -158,16 +160,17 @@ fun StockScreen(store: MediaStore) {
 @Composable
 private fun SwipeItem(store: MediaStore, item: ContentItem, modifier: Modifier = Modifier) {
     val haptic = LocalHapticFeedback.current
+    val latest by rememberUpdatedState(item) // the swipe state outlives one version of the item
     val state = rememberSwipeToDismissBoxState(
         confirmValueChange = { value ->
             when (value) {
-                SwipeToDismissBoxValue.StartToEnd -> if (item.status != ItemStatus.UPLOADED) {
+                SwipeToDismissBoxValue.StartToEnd -> if (latest.status != ItemStatus.UPLOADED) {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    store.setItemStatus(item, ItemStatus.UPLOADED)
+                    store.setItemStatus(latest, ItemStatus.UPLOADED)
                 }
-                SwipeToDismissBoxValue.EndToStart -> if (item.status != ItemStatus.NOT_NEEDED) {
+                SwipeToDismissBoxValue.EndToStart -> if (latest.status != ItemStatus.NOT_NEEDED) {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    store.setItemStatus(item, ItemStatus.NOT_NEEDED)
+                    store.setItemStatus(latest, ItemStatus.NOT_NEEDED)
                 }
                 SwipeToDismissBoxValue.Settled -> Unit
             }

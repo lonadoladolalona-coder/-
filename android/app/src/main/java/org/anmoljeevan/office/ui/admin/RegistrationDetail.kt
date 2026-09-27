@@ -85,6 +85,7 @@ fun RegistrationDetail(
     val style = sourceStyle(r.source)
     val hasId = r.id.isNotEmpty()
     val dup = RegistrationRules.dupCount(r, store.dupCounts)
+    val key = store.keyFor(r)
     BackHandler { store.detailKey = null }
 
     with(shared) {
@@ -92,7 +93,7 @@ fun RegistrationDetail(
             modifier = Modifier
                 .fillMaxSize()
                 .sharedBounds(
-                    rememberSharedContentState("card-${r.key}"),
+                    rememberSharedContentState("card-$key"),
                     animatedVisibilityScope = anim,
                     resizeMode = SharedTransitionScope.ResizeMode.RemeasureToBounds,
                 ),
@@ -128,7 +129,7 @@ fun RegistrationDetail(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 Modifier
-                                    .sharedElement(rememberSharedContentState("avatar-${r.key}"), anim)
+                                    .sharedElement(rememberSharedContentState("avatar-$key"), anim)
                                     .size(72.dp)
                                     .clip(CircleShape)
                                     .background(Color.White.copy(alpha = 0.18f)),
@@ -142,7 +143,7 @@ fun RegistrationDetail(
                                     r.name.ifBlank { "(no name)" },
                                     style = MaterialTheme.typography.headlineMedium,
                                     color = Color.White,
-                                    modifier = Modifier.sharedBounds(rememberSharedContentState("name-${r.key}"), anim),
+                                    modifier = Modifier.sharedBounds(rememberSharedContentState("name-$key"), anim),
                                 )
                                 Spacer(Modifier.height(6.dp))
                                 Row(
