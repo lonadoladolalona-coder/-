@@ -18,6 +18,7 @@ from openpyxl.worksheet.page import PageMargins
 
 HERE = Path(__file__).resolve().parent
 OUT_XLSX = HERE / "Nursing_Roster_Oct-Dec_2026.xlsx"
+OUT_ICU1ST_XLSX = HERE / "ICU1ST_Roster_Oct-Dec_2026.xlsx"
 
 SEPT_START = dt.date(2026, 9, 1)
 MONTHS = [(2026, 10), (2026, 11), (2026, 12)]
@@ -159,7 +160,7 @@ def header_row(ws, row, label, sno, days, year, month):
     ws.row_dimensions[row].height = 26
 
 
-def write_month(wb, year, month, sections):
+def write_month(wb, year, month, sections, include_counts=True):
     days = (dt.date(year + month // 12, month % 12 + 1, 1)
             - dt.date(year, month, 1)).days
     title = dt.date(year, month, 1).strftime("%B").upper()
@@ -198,7 +199,25 @@ def write_month(wb, year, month, sections):
 
     # Daily head-count per section, kept live with COUNTIF so manual swaps
     # made later in Excel are reflected automatically.
-    row += 2
+    if include_counts:
+        write_counts(ws, row + 2, days, section_ranges)
+
+    ws.column_dimensions["A"].width = 5
+    ws.column_dimensions["B"].width = 17
+    for d in range(1, days + 1):
+        ws.column_dimensions[get_column_letter(d + 2)].width = 3.9
+    ws.freeze_panes = "C3"
+
+    ws.page_setup.orientation = "landscape"
+    ws.page_setup.paperSize = ws.PAPERSIZE_A4
+    ws.page_setup.fitToWidth = 1
+    ws.page_setup.fitToHeight = 1
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_margins = PageMargins(left=0.3, right=0.3, top=0.4, bottom=0.4)
+    ws.print_options.horizontalCentered = True
+
+
+def write_counts(ws, row, days, section_ranges):
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=2)
     cell(ws, row, 1, "STAFF ON DUTY (auto count)", bold=True, fill=GREY,
          align=LEFT, size=9)
@@ -218,29 +237,24 @@ def write_month(wb, year, month, sections):
                      size=9)
             row += 1
 
-    ws.column_dimensions["A"].width = 5
-    ws.column_dimensions["B"].width = 17
-    for d in range(1, days + 1):
-        ws.column_dimensions[get_column_letter(d + 2)].width = 3.9
-    ws.freeze_panes = "C3"
 
-    ws.page_setup.orientation = "landscape"
-    ws.page_setup.paperSize = ws.PAPERSIZE_A4
-    ws.page_setup.fitToWidth = 1
-    ws.page_setup.fitToHeight = 1
-    ws.sheet_properties.pageSetUpPr.fitToPage = True
-    ws.page_margins = PageMargins(left=0.3, right=0.3, top=0.4, bottom=0.4)
-    ws.print_options.horizontalCentered = True
+def save_workbook(path, rosters, sections=None, include_counts=True):
+    """Write one sheet per month, optionally limited to some sections."""
+    wb = Workbook()
+    wb.remove(wb.active)
+    for (y, m) in MONTHS:
+        month = [(s, staff) for s, staff in rosters[(y, m)]
+                 if sections is None or s in sections]
+        write_month(wb, y, m, month, include_counts)
+    wb.save(path)
+    print(f"Saved {path.name}")
 
 
 def main():
     rosters, notes = build_rosters()
-    wb = Workbook()
-    wb.remove(wb.active)
-    for (y, m) in MONTHS:
-        write_month(wb, y, m, rosters[(y, m)])
-    wb.save(OUT_XLSX)
-    print(f"Saved {OUT_XLSX.name}")
+    save_workbook(OUT_XLSX, rosters)
+    save_workbook(OUT_ICU1ST_XLSX, rosters, sections={"ICU1ST"},
+                  include_counts=False)
     for n in notes:
         print("NOTE:", n)
 
