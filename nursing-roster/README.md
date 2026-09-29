@@ -2,7 +2,7 @@
 
 - `Nursing_Roster_Oct-Dec_2026.xlsx`: editable roster with one sheet per month (OCT, NOV, DEC).
 - `Nursing_Roster_Oct-Dec_2026.pdf`: print-ready copy on A4 landscape, one page per month.
-- `ICU1ST_Roster_Oct-Dec_2026.xlsx` / `.pdf`: ICU 1st staff only (Sourabh to Abigel), with all three months on one page.
+- `ICU1ST_Roster_Oct-Dec_2026.xlsx` / `.pdf` / `.png`: ICU 1st staff only (Sourabh to Abigel), with all three months on one page. The PNG is a 400 dpi image for sharing on phones.
 - `generate_roster.py`: rebuilds both workbooks from the September 2026 roster.
 
 ## How it continues September
