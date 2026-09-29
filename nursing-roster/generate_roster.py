@@ -160,22 +160,24 @@ def header_row(ws, row, label, sno, days, year, month):
     ws.row_dimensions[row].height = 26
 
 
-def write_month(wb, year, month, sections, include_counts=True):
-    days = (dt.date(year + month // 12, month % 12 + 1, 1)
+def month_days(year, month):
+    return (dt.date(year + month // 12, month % 12 + 1, 1)
             - dt.date(year, month, 1)).days
-    title = dt.date(year, month, 1).strftime("%B").upper()
-    ws = wb.create_sheet(title[:3])
-    last_col = days + 2
 
-    ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=last_col)
-    cell(ws, 1, 1, f"NURSING ROSTER MONTH OF {title} {year}", bold=True,
-         size=13, border=False)
-    ws.row_dimensions[1].height = 22
 
-    row, sno, section_ranges = 2, 1, []
+def write_title(ws, row, text, last_col):
+    ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=last_col)
+    cell(ws, row, 1, text, bold=True, size=13, border=False)
+    ws.row_dimensions[row].height = 22
+
+
+def write_staff(ws, row, year, month, sections, first_label=None):
+    """Header bar plus one line per nurse for each section; returns next row."""
+    days = month_days(year, month)
+    sno, section_ranges = 1, []
     for i, (section, staff) in enumerate(sections):
-        header_row(ws, row, section, "SNO" if i == 0 else "@",
-                   days, year, month)
+        label = first_label if (i == 0 and first_label) else section
+        header_row(ws, row, label, "SNO" if i == 0 else "@", days, year, month)
         row += 1
         first = row
         for name, codes in staff:
@@ -190,24 +192,21 @@ def write_month(wb, year, month, sections, include_counts=True):
             row += 1
             sno += 1
         section_ranges.append((section, first, row - 1))
+    return row, section_ranges
 
-    row += 1
+
+def write_legend(ws, row, last_col):
     ws.merge_cells(start_row=row, start_column=1, end_row=row, end_column=last_col)
     cell(ws, row, 1, "A = Morning     B = Evening     C = Night     "
                      "G = General     O = Weekly Off", bold=True, border=False,
          align=LEFT)
 
-    # Daily head-count per section, kept live with COUNTIF so manual swaps
-    # made later in Excel are reflected automatically.
-    if include_counts:
-        write_counts(ws, row + 2, days, section_ranges)
 
+def setup_page(ws, days):
     ws.column_dimensions["A"].width = 5
     ws.column_dimensions["B"].width = 17
     for d in range(1, days + 1):
         ws.column_dimensions[get_column_letter(d + 2)].width = 3.9
-    ws.freeze_panes = "C3"
-
     ws.page_setup.orientation = "landscape"
     ws.page_setup.paperSize = ws.PAPERSIZE_A4
     ws.page_setup.fitToWidth = 1
@@ -215,6 +214,38 @@ def write_month(wb, year, month, sections, include_counts=True):
     ws.sheet_properties.pageSetUpPr.fitToPage = True
     ws.page_margins = PageMargins(left=0.3, right=0.3, top=0.4, bottom=0.4)
     ws.print_options.horizontalCentered = True
+
+
+def write_month(wb, year, month, sections):
+    days = month_days(year, month)
+    title = dt.date(year, month, 1).strftime("%B").upper()
+    ws = wb.create_sheet(title[:3])
+    write_title(ws, 1, f"NURSING ROSTER MONTH OF {title} {year}", days + 2)
+    row, section_ranges = write_staff(ws, 2, year, month, sections)
+    write_legend(ws, row + 1, days + 2)
+    # Daily head-count per section, kept live with COUNTIF so manual swaps
+    # made later in Excel are reflected automatically.
+    write_counts(ws, row + 3, days, section_ranges)
+    ws.freeze_panes = "C3"
+    setup_page(ws, days)
+
+
+def write_quarter(wb, rosters, section):
+    """All months stacked on one printable sheet for a single section."""
+    (y1, m1), (y2, m2) = MONTHS[0], MONTHS[-1]
+    first, last = dt.date(y1, m1, 1), dt.date(y2, m2, 1)
+    ws = wb.create_sheet(f"{first:%b}-{last:%b}".upper())
+    last_col = max(month_days(y, m) for y, m in MONTHS) + 2
+    write_title(ws, 1, f"NURSING ROSTER {section}  -  {first:%B} TO "
+                       f"{last:%B} {y2}".upper(), last_col)
+    row = 2
+    for (y, m) in MONTHS:
+        staff = [(s, st) for s, st in rosters[(y, m)] if s == section]
+        row, _ = write_staff(ws, row, y, m, staff,
+                             first_label=dt.date(y, m, 1).strftime("%B %Y").upper())
+        row += 1
+    write_legend(ws, row, last_col)
+    setup_page(ws, last_col - 2)
 
 
 def write_counts(ws, row, days, section_ranges):
@@ -238,14 +269,12 @@ def write_counts(ws, row, days, section_ranges):
             row += 1
 
 
-def save_workbook(path, rosters, sections=None, include_counts=True):
-    """Write one sheet per month, optionally limited to some sections."""
+def save_workbook(path, rosters):
+    """Write one sheet per month with every section."""
     wb = Workbook()
     wb.remove(wb.active)
     for (y, m) in MONTHS:
-        month = [(s, staff) for s, staff in rosters[(y, m)]
-                 if sections is None or s in sections]
-        write_month(wb, y, m, month, include_counts)
+        write_month(wb, y, m, rosters[(y, m)])
     wb.save(path)
     print(f"Saved {path.name}")
 
@@ -253,8 +282,11 @@ def save_workbook(path, rosters, sections=None, include_counts=True):
 def main():
     rosters, notes = build_rosters()
     save_workbook(OUT_XLSX, rosters)
-    save_workbook(OUT_ICU1ST_XLSX, rosters, sections={"ICU1ST"},
-                  include_counts=False)
+    wb = Workbook()
+    wb.remove(wb.active)
+    write_quarter(wb, rosters, "ICU1ST")
+    wb.save(OUT_ICU1ST_XLSX)
+    print(f"Saved {OUT_ICU1ST_XLSX.name}")
     for n in notes:
         print("NOTE:", n)
 
